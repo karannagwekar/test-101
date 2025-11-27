@@ -27,7 +27,7 @@ resource "aws_security_group" "ec2_sg" {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = ["107.207.144.104/24"]
+    cidr_blocks = ["107.207.144.0/24"]
   }
 
   # Allow HTTPS inbound
@@ -36,7 +36,7 @@ resource "aws_security_group" "ec2_sg" {
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
-    cidr_blocks = ["107.207.144.104/24"]
+    cidr_blocks = ["107.207.144.0/24"]
   }
 
   # Allow all outbound traffic

@@ -43,7 +43,7 @@ variable "enable_public_ip" {
 variable "allow_ssh_cidr" {
   description = "CIDR block allowed for SSH access"
   type        = list(string)
-  default     = ["107.207.144.104/24"]
+  default     = ["107.207.144.0/24"]
 }
 
 variable "tags" {
