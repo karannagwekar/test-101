@@ -31,7 +31,7 @@ variable "instance_name" {
 variable "ami" {
   description = "AMI ID for the EC2 instance (Ubuntu 22.04 LTS)"
   type        = string
-  default     = "ami-0c55b159cbfafe1f0"
+  default     = "ami-0fa3fe0fa7920f68e"
 }
 
 variable "enable_public_ip" {
