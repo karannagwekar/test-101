@@ -1,3 +1,40 @@
+# Create IAM role for EC2 to use Session Manager
+resource "aws_iam_role" "ec2_ssm_role" {
+  name = "${var.project_name}-ssm-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        }
+      }
+    ]
+  })
+
+  tags = merge(
+    var.tags,
+    {
+      Name = "${var.project_name}-ssm-role"
+    }
+  )
+}
+
+# Attach the AWS managed policy for SSM
+resource "aws_iam_role_policy_attachment" "ssm_policy" {
+  role       = aws_iam_role.ec2_ssm_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
+
+# Create instance profile for the IAM role
+resource "aws_iam_instance_profile" "ec2_profile" {
+  name = "${var.project_name}-instance-profile"
+  role = aws_iam_role.ec2_ssm_role.name
+}
+
 # Create a security group for the EC2 instance
 resource "aws_security_group" "ec2_sg" {
   name        = "${var.project_name}-sg"
@@ -58,10 +95,11 @@ resource "aws_security_group" "ec2_sg" {
 
 # Create the EC2 instance
 resource "aws_instance" "web" {
-  ami                         = var.ami
-  instance_type               = var.instance_type
+  ami                    = var.ami
+  instance_type          = var.instance_type
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.name
   associate_public_ip_address = var.enable_public_ip
-  vpc_security_group_ids      = [aws_security_group.ec2_sg.id]
+  vpc_security_group_ids = [aws_security_group.ec2_sg.id]
 
   tags = merge(
     var.tags,
