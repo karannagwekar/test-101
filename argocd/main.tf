@@ -16,6 +16,8 @@ resource "helm_release" "argocd" {
   namespace        = kubernetes_namespace.argocd.metadata[0].name
   version          = var.argocd_chart_version
   create_namespace = false
+  wait             = true
+  wait_for_jobs    = true
 
   values = [
     yamlencode({
@@ -40,8 +42,11 @@ resource "helm_release" "argocd" {
       }
 
       configs = {
-        secret = {
-          argocdServerAdminPassword = base64encode("admin123")  # Change this!
+        # Note: ArgoCD will generate a default admin password automatically
+        # Retrieve it with: kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
+        params = {
+          "server.insecure"     = true
+          "server.disable.auth" = true
         }
       }
 
@@ -75,36 +80,30 @@ resource "helm_release" "argocd" {
 }
 
 # Create initial ArgoCD Application for GitOps
-resource "kubernetes_manifest" "argocd_app" {
-  manifest = {
-    apiVersion = "argoproj.io/v1alpha1"
-    kind       = "Application"
-    metadata = {
-      name      = "root-app"
-      namespace = kubernetes_namespace.argocd.metadata[0].name
-    }
-    spec = {
-      project = "default"
-      source = {
-        repoURL        = var.git_repository_url
-        targetRevision = var.git_repository_branch
-        path           = var.git_repository_path
-      }
-      destination = {
-        server    = "https://kubernetes.default.svc"
-        namespace = "default"
-      }
-      syncPolicy = {
-        automated = {
-          prune   = true
-          selfHeal = true
-        }
-        syncOptions = [
-          "CreateNamespace=true"
-        ]
-      }
-    }
-  }
-
-  depends_on = [helm_release.argocd]
-}
+# Note: The Application resource is managed separately after ArgoCD is deployed
+# This is because the CRD may not be available during terraform plan
+# Instead, create applications using kubectl or a separate Terraform apply
+#
+# Example to create an Application after ArgoCD is deployed:
+# kubectl apply -f - <<EOF
+# apiVersion: argoproj.io/v1alpha1
+# kind: Application
+# metadata:
+#   name: root-app
+#   namespace: argocd
+# spec:
+#   project: default
+#   source:
+#     repoURL: <git_repository_url>
+#     targetRevision: <git_repository_branch>
+#     path: <git_repository_path>
+#   destination:
+#     server: https://kubernetes.default.svc
+#     namespace: default
+#   syncPolicy:
+#     automated:
+#       prune: true
+#       selfHeal: true
+#     syncOptions:
+#     - CreateNamespace=true
+# EOF

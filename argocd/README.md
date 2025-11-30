@@ -50,7 +50,7 @@ cluster_type    = "eks"
 
 4. **Access ArgoCD:**
    ```bash
-   # Get the initial admin password
+   # Get the initial auto-generated admin password
    kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath='{.data.password}' | base64 -d
    
    # Port-forward to access the UI (default setup)
