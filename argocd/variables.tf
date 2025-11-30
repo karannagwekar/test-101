@@ -1,7 +1,7 @@
 variable "kubeconfig_path" {
   description = "Path to kubeconfig file for the target cluster (e.g., ~/.kube/config for k3d or ~/.kube/eks-config for EKS)"
   type        = string
-  default     = "~/.kube/k3d-config"
+  default     = "~/.kube/config"
 }
 
 variable "cluster_type" {
