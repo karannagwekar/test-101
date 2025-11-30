@@ -1,0 +1,8 @@
+# K3D Cluster Configuration Example
+# Copy this file to terraform.tfvars and adjust values as needed
+
+cluster_name = "k3d-cluster"
+k8s_version  = "v1.31.1"
+nodes_count  = 1
+agent_nodes_count = 2
+port_mapping = "8080:80@loadbalancer"
