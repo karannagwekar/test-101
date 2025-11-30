@@ -50,15 +50,17 @@ cluster_type    = "eks"
 
 4. **Access ArgoCD:**
    ```bash
-   # Get the initial auto-generated admin password
-   kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath='{.data.password}' | base64 -d
-   
-   # Port-forward to access the UI (default setup)
+   # Port-forward to access the UI
    kubectl port-forward -n argocd svc/argocd-server 8080:443
    
-   # Then visit: https://localhost:8080
+   # Get the auto-generated admin password (store this safely!)
+   kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath='{.data.password}' | base64 -d
+   
+   # Then visit: https://localhost:8080 (or http://localhost:8080)
    # Username: admin
-   # Password: <from above command>
+   # Password: (from command above)
+   
+   # After first login, change the password using the UI or CLI
    ```
 
 ## Verifying the Target Cluster

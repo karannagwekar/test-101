@@ -15,7 +15,7 @@ output "argocd_admin_username" {
 }
 
 output "get_initial_password" {
-  description = "Command to get initial admin password"
+  description = "Command to get the auto-generated initial admin password"
   value       = "kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath='{.data.password}' | base64 -d"
 }
 
