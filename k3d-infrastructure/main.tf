@@ -1,31 +1,22 @@
-resource "k3d_cluster" "main" {
-  name            = var.cluster_name
-  servers         = 1
-  agents          = var.agent_nodes_count
-  image           = "rancher/k3s:${var.k8s_version}"
-  network         = "k3d-network"
-  wait            = true
-  disable         = ["traefik"]
-
-  port {
-    host      = 8080
-    container = 80
-    protocol  = "TCP"
+resource "null_resource" "k3d_cluster" {
+  provisioner "local-exec" {
+    command = "k3d cluster create ${var.cluster_name} --image rancher/k3s:${var.k8s_version} --agents ${var.agent_nodes_count} --servers 1 --port 8080:80@server:0 --port 6443:6443@server:0 --k3s-arg '--disable=traefik@server:0' --wait"
   }
 
-  port {
-    host      = 6443
-    container = 6443
-    protocol  = "TCP"
+  lifecycle {
+    ignore_changes = all
+  }
+}
+
+resource "null_resource" "k3d_cluster_delete" {
+  triggers = {
+    cluster_name = var.cluster_name
   }
 
-  label {
-    key   = "environment"
-    value = "development"
+  provisioner "local-exec" {
+    when    = destroy
+    command = "k3d cluster delete ${self.triggers.cluster_name}"
   }
 
-  env {
-    key   = "K3S_DEBUG"
-    value = "false"
-  }
+  depends_on = [null_resource.k3d_cluster]
 }

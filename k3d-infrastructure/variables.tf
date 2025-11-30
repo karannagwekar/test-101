@@ -7,7 +7,7 @@ variable "cluster_name" {
 variable "k8s_version" {
   description = "Kubernetes version for the cluster"
   type        = string
-  default     = "v1.31.1"
+  default     = "v1.31.1-k3s1"
 }
 
 variable "nodes_count" {

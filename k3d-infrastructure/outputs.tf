@@ -1,6 +1,6 @@
 output "cluster_name" {
   description = "The name of the k3d cluster"
-  value       = k3d_cluster.main.name
+  value       = var.cluster_name
 }
 
 output "k8s_version" {
@@ -8,12 +8,12 @@ output "k8s_version" {
   value       = var.k8s_version
 }
 
-output "cluster_servers" {
-  description = "Number of server nodes"
-  value       = k3d_cluster.main.servers
+output "cluster_info" {
+  description = "Information about the cluster"
+  value       = "Run 'k3d cluster list' to see your cluster details"
 }
 
-output "cluster_agents" {
-  description = "Number of agent nodes"
-  value       = k3d_cluster.main.agents
+output "kubeconfig_info" {
+  description = "How to get kubeconfig"
+  value       = "Run 'k3d kubeconfig get ${var.cluster_name}' to get kubeconfig"
 }
