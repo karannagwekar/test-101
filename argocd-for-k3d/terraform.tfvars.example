@@ -1,0 +1,14 @@
+# ArgoCD Terraform Configuration for K3D
+# Copy this file to terraform.tfvars and adjust values as needed
+
+# K3D Cluster Configuration (this is K3D-specific setup)
+kubeconfig_path        = "~/.kube/k3d-config"
+cluster_type           = "k3d"
+
+argocd_namespace       = "argocd"
+argocd_chart_version   = "7.0.0"
+argocd_domain          = "argocd-k3d.example.com"
+git_repository_url     = "https://github.com/your-org/your-gitops-repo.git"
+git_repository_branch  = "main"
+git_repository_path    = "k8s-manifests"
+enable_ingress         = false  # K3D uses LoadBalancer service instead

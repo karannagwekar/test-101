@@ -1,0 +1,14 @@
+# ArgoCD Terraform Configuration for EKS
+# Copy this file to terraform.tfvars and adjust values as needed
+
+# EKS Cluster Configuration (this is EKS-specific setup)
+kubeconfig_path        = "~/.kube/eks-config"
+cluster_type           = "eks"
+
+argocd_namespace       = "argocd"
+argocd_chart_version   = "7.0.0"
+argocd_domain          = "argocd-eks.example.com"
+git_repository_url     = "https://github.com/your-org/your-gitops-repo.git"
+git_repository_branch  = "main"
+git_repository_path    = "k8s-manifests"
+enable_ingress         = true  # EKS typically has Ingress controllers, so enable by default

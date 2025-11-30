@@ -1,9 +1,10 @@
-# Create ArgoCD namespace
+# Create ArgoCD namespace for EKS Cluster
 resource "kubernetes_namespace" "argocd" {
   metadata {
     name = var.argocd_namespace
     labels = {
       "app.kubernetes.io/name" = "argocd"
+      "cluster-type"           = "eks"
     }
   }
 }
