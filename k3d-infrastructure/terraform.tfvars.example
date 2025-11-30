@@ -1,8 +1,18 @@
 # K3D Cluster Configuration Example
 # Copy this file to terraform.tfvars and adjust values as needed
 
-cluster_name = "k3d-cluster"
-k8s_version  = "v1.31.1-k3s1"
-nodes_count  = 1
+# Basic cluster configuration
+cluster_name      = "k3d-cluster"
+k8s_version       = "v1.31.1-k3s1"
 agent_nodes_count = 2
-port_mapping = "8080:80@loadbalancer"
+
+# Traefik Ingress Controller port mappings
+# Set enable_traefik_port_mapping to false if you don't want these ports mapped
+enable_traefik_port_mapping = true
+traefik_http_port           = 8080  # HTTP traffic from host will go to port 80 in container
+traefik_https_port          = 8443  # HTTPS traffic from host will go to port 443 in container
+
+# MetalLB Load Balancer IP pool configuration
+# These IPs will be used by MetalLB to assign to LoadBalancer services
+metallb_ip_pool_start = "172.18.0.200"
+metallb_ip_pool_size  = 50  # Creates pool from 172.18.0.200 to 172.18.0.249

@@ -1,6 +1,6 @@
 resource "null_resource" "k3d_cluster" {
   provisioner "local-exec" {
-    command = "k3d cluster create ${var.cluster_name} --image rancher/k3s:${var.k8s_version} --agents ${var.agent_nodes_count} --servers 1 --port 8080:80@server:0 --port 6443:6443@server:0 --k3s-arg '--disable=traefik@server:0' --wait"
+    command = "k3d cluster create ${var.cluster_name} --image rancher/k3s:${var.k8s_version} --agents ${var.agent_nodes_count} --servers 1 ${var.enable_traefik_port_mapping ? "--port ${var.traefik_http_port}:80@server:0 --port ${var.traefik_https_port}:443@server:0" : ""} --port 6443:6443@server:0 --k3s-arg '--disable=traefik@server:0' --wait"
   }
 
   lifecycle {
