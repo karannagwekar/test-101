@@ -72,7 +72,7 @@ resource "aws_security_group" "eks_cluster" {
 }
 
 # Allow worker nodes to communicate with cluster API
-resource "aws_security_group_ingress" "cluster_ingress_workstation_https" {
+resource "aws_security_group_rule" "cluster_ingress_workstation_https" {
   description       = "Allow workstation to communicate with the cluster API"
   type              = "ingress"
   from_port         = 443
@@ -163,36 +163,45 @@ resource "aws_security_group" "eks_nodes" {
   description = "Security group for EKS worker nodes"
   vpc_id      = var.vpc_id
 
-  ingress {
-    description     = "Allow nodes to communicate with each other"
-    from_port       = 0
-    to_port         = 65535
-    protocol        = "tcp"
-    security_groups = [aws_security_group.eks_nodes.id]
-  }
-
-  ingress {
-    description     = "Allow worker Kubelets and secondary ENIs to receive communication from the cluster control plane"
-    from_port       = 1025
-    to_port         = 65535
-    protocol        = "tcp"
-    security_groups = [aws_security_group.eks_cluster.id]
-  }
-
-  egress {
-    description = "Allow all outbound traffic"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
   tags = merge(
     var.tags,
     {
       Name = "${var.cluster_name}-nodes-sg"
     }
   )
+}
+
+# Allow nodes to communicate with each other
+resource "aws_security_group_rule" "nodes_ingress_self" {
+  description              = "Allow nodes to communicate with each other"
+  type                     = "ingress"
+  from_port                = 0
+  to_port                  = 65535
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.eks_nodes.id
+  source_security_group_id = aws_security_group.eks_nodes.id
+}
+
+# Allow worker Kubelets and secondary ENIs to receive communication from the cluster control plane
+resource "aws_security_group_rule" "nodes_ingress_cluster" {
+  description              = "Allow worker Kubelets and secondary ENIs to receive communication from the cluster control plane"
+  type                     = "ingress"
+  from_port                = 1025
+  to_port                  = 65535
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.eks_nodes.id
+  source_security_group_id = aws_security_group.eks_cluster.id
+}
+
+# Allow all outbound traffic from nodes
+resource "aws_security_group_rule" "nodes_egress" {
+  description       = "Allow all outbound traffic"
+  type              = "egress"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  security_group_id = aws_security_group.eks_nodes.id
+  cidr_blocks       = ["0.0.0.0/0"]
 }
 
 # Create EKS node group
@@ -227,7 +236,7 @@ resource "aws_eks_node_group" "main" {
 }
 
 # Allow cluster security group to receive communication from nodes
-resource "aws_security_group_ingress" "cluster_ingress_node_https" {
+resource "aws_security_group_rule" "cluster_ingress_node_https" {
   description              = "Allow nodes to communicate with the cluster API"
   type                     = "ingress"
   from_port                = 443
