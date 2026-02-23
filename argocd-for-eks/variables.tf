@@ -1,7 +1,12 @@
 variable "kubeconfig_path" {
-  description = "Path to kubeconfig file for EKS cluster"
+  description = "Path to kubeconfig file"
   type        = string
-  default     = "~/.kube/eks-config"
+  default     = "~/.kube/config"
+}
+
+variable "kubeconfig_context" {
+  description = "Kubeconfig context name to target. Run 'kubectl config get-contexts' to list available contexts."
+  type        = string
 }
 
 variable "cluster_type" {
