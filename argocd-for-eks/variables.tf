@@ -60,3 +60,15 @@ variable "enable_ingress" {
   type        = bool
   default     = false
 }
+
+variable "server_insecure" {
+  description = "Run ArgoCD server without TLS (set true when TLS is terminated externally by a load balancer or ingress)"
+  type        = bool
+  default     = true
+}
+
+variable "acm_certificate_arn" {
+  description = "ACM certificate ARN for ELB SSL termination. When set, the Classic ELB will terminate HTTPS using this cert and forward plain HTTP to ArgoCD. Find yours with: aws acm list-certificates --region us-east-1"
+  type        = string
+  default     = ""
+}
